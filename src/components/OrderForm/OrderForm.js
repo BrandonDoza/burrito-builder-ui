@@ -1,11 +1,22 @@
 import { useState } from "react";
 
-function OrderForm(props) {
+function OrderForm({addOrder}) {
   const [name, setName] = useState("");
   const [ingredients, setIngredients] = useState([]);
 
   function handleSubmit(e) {
     e.preventDefault();
+    const newOrder = {
+      name: name,
+      ingredients: ingredients
+    }
+    if (ingredients.length === 0) {
+      document.getElementById('error-element').innerText="You must choose at least one ingredient, please start over"
+    } else if (name === '') {
+      document.getElementById('error-element').innerText="You must add your name, please start over"
+    } else {
+      addOrder(newOrder)
+    }
     clearInputs();
   }
 
@@ -13,6 +24,17 @@ function OrderForm(props) {
     setName("");
     setIngredients([]);
   };
+
+  function handleChange(e) {
+    setName(e.target.value)
+  }
+
+  function addIngredients(e) {
+    e.preventDefault()
+    setIngredients(prevIngredients => {
+      return [...prevIngredients, e.target.name]
+    })
+  }
 
   const possibleIngredients = [
     "beans",
@@ -33,7 +55,7 @@ function OrderForm(props) {
       <button
         key={ingredient}
         name={ingredient}
-        // onClick={(e) => }
+        onClick={addIngredients}
       >
         {ingredient}
       </button>
@@ -47,14 +69,15 @@ function OrderForm(props) {
         placeholder="Name"
         name="name"
         value={name}
-        // onChange={(e) => }
+        onChange={handleChange}
       />
 
       {ingredientButtons}
 
       <p>Order: {ingredients.join(", ") || "Nothing selected"}</p>
+      <p id="error-element"></p>
 
-      <button onClick={(e) => handleSubmit(e)}>Submit Order</button>
+      <button onClick={(e) => handleSubmit(e)} className="order-button">Submit Order</button>
     </form>
   );
 }
